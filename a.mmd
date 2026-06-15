@@ -1,0 +1,25 @@
+flowchart TB
+    user["User / Browser / SSH Client"]
+
+    subgraph azure["Azure - West US 3"]
+        subgraph rg["Resource Group: he000145-A05-RG"]
+            pip["Public IP<br/>20.163.89.233"]
+
+            nsg["Network Security Group<br/>Allow SSH: 22<br/>Allow HTTP: 80"]
+
+            subgraph vnet["Virtual Network<br/>10.0.0.0/16"]
+                subgraph subnet["Subnet<br/>10.0.1.0/24"]
+                    nic["Network Interface Card<br/>Private IP: 10.0.1.4"]
+                    vm["Ubuntu Linux VM<br/>Size: Standard_B2ats_v2<br/>Apache Web Server"]
+                end
+            end
+        end
+    end
+
+    user -->|"HTTP :80"| pip
+    user -->|"SSH :22"| pip
+    pip --> nic
+    nsg --> nic
+    nic --> vm
+
+    vm -->|"cloud-init"| apache["Install Apache2<br/>apt-get update<br/>apt-get install apache2"]
